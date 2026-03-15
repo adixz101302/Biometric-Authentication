@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Biometrics</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="cyber-container">
+        <!-- Abstract Cyber Background -->
+        <div class="background-grid"></div>
+        <div class="scanline"></div>
+
+        <nav class="cyber-nav">
+            <div class="logo">
+                <i class="fa-solid fa-expand scanner-icon"></i>
+                <span class="neon-text">SecureBio</span>
+                <span class="version">v1.0.0</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('home') }}" class="nav-btn"><i class="fa-solid fa-house"></i> Home</a></li>
+                <li><a href="{{ url_for('register_page') }}" class="nav-btn"><i class="fa-solid fa-user-plus"></i> Register</a></li>
+                <li><a href="{{ url_for('login_page') }}" class="nav-btn"><i class="fa-solid fa-fingerprint"></i> Login</a></li>
+                <li><a href="{{ url_for('admin_page') }}" class="nav-btn admin-btn"><i class="fa-solid fa-shield-halved"></i> Admin</a></li>
+            </ul>
+        </nav>
+
+        <main class="content-wrapper">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

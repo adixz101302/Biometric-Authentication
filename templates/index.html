@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="cyber-card" style="max-width: 600px; text-align: center;">
+    <h1 class="card-title" style="font-size: 2.5rem; margin-bottom: 2rem;">Secure Biometric Access</h1>
+    
+    <div style="margin-bottom: 2rem;">
+        <i class="fa-solid fa-fingerprint" style="font-size: 5rem; color: var(--neon-blue); animation: pulse 3s infinite;"></i>
+    </div>
+    
+    <p style="margin-bottom: 2rem; color: var(--text-secondary); line-height: 1.6;">
+        Welcome to the next generation of secure authentication. 
+        Forget passwords. Your unique biological signature is your key.
+        System initialized and ready for biometric scanning.
+    </p>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{{ url_for('login_page') }}" class="cyber-button" style="text-decoration: none; display: inline-block;">Initiate Login Scan</a>
+        <a href="{{ url_for('register_page') }}" class="cyber-button" style="text-decoration: none; display: inline-block; border-color: var(--text-secondary); color: var(--text-secondary);">Register New Signature</a>
+    </div>
+</div>
+{% endblock %}

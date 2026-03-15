@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="width: 100%; max-width: 1000px; padding: 20px;">
+    <h2 class="card-title" style="text-align: left; border-bottom: 2px solid var(--neon-pink); padding-bottom: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+        <span>System Admin Dashboard</span>
+        <span style="font-size: 1rem; color: var(--text-secondary); text-transform: none;"><i class="fa-solid fa-lock"></i> Secure Level 5</span>
+    </h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+        <!-- Users Table -->
+        <div class="cyber-card">
+            <h3>Registered Identities</h3>
+            <table class="cyber-table" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Logs Table -->
+        <div class="cyber-card">
+            <h3>Authentication Logs</h3>
+            <table class="cyber-table" id="logsTable">
+                <thead>
+                    <tr>
+                        <th>Identity</th>
+                        <th>Action</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUsers();
+        loadLogs();
+        
+        // Refresh logs every 10 seconds
+        setInterval(loadLogs, 10000);
+
+        async function loadUsers() {
+            try {
+                const res = await fetch('/api/users');
+                const users = await res.json();
+                const tbody = document.querySelector('#usersTable tbody');
+                tbody.innerHTML = '';
+                
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td style="font-family: monospace;">${user.email}</td>
+                        <td><button class="delete-btn" onclick="deleteUser(${user.id})"><i class="fa-solid fa-trash"></i></button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadLogs() {
+            try {
+                const res = await fetch('/api/logs');
+                const logs = await res.json();
+                const tbody = document.querySelector('#logsTable tbody');
+                tbody.innerHTML = '';
+                
+                logs.forEach(log => {
+                    const row = document.createElement('tr');
+                    const statusClass = log.status === 'success' ? 'badge-success' : 'badge-error';
+                    const identity = log.email ? log.email : '<span style="color:var(--neon-red)">Unknown</span>';
+                    // Format timestamp
+                    const date = new Date(log.timestamp + 'Z'); // SQLite UTC to local
+                    row.innerHTML = `
+                        <td>${identity}</td>
+                        <td style="text-transform: uppercase;">${log.action}</td>
+                        <td><span class="badge ${statusClass}">${log.status}</span></td>
+                        <td style="font-size: 0.8rem; color: var(--text-secondary);">${date.toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        window.deleteUser = async function(id) {
+            if (confirm(`Erase identity ID ${id} from secure storage?`)) {
+                try {
+                    await fetch(`/api/users/${id}`, { method: 'DELETE' });
+                    loadUsers();
+                    loadLogs();
+                } catch (err) {
+                    alert('Error deleting user');
+                }
+            }
+        };
+    });
+</script>
+{% endblock %}

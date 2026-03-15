@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="cyber-card" style="width: 100%; max-width: 600px;">
+    <h2 class="card-title">Register Biometric Signature</h2>
+    
+    <div id="registrationForm">
+        <div class="form-group">
+            <input type="text" id="userName" class="cyber-input" placeholder="Enter Full Name" required>
+        </div>
+        <div class="form-group">
+            <input type="email" id="userEmail" class="cyber-input" placeholder="Enter Email Address" required>
+        </div>
+        <button id="startBtn" class="cyber-button">Initialize Scanner</button>
+    </div>
+
+    <div id="scannerSection" style="display: none; margin-top: 20px;">
+        <div class="webcam-container">
+            <video id="videoElement" autoplay playsinline></video>
+            <canvas id="canvasElement" class="overlay"></canvas>
+        </div>
+        
+        <div id="statusText" class="status-indicator status-detecting">Position face in the center of the frame...</div>
+        
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <p style="text-align: center; color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem;" id="captureInstructions">
+            Capturing 10 unique angles. Please move your head slightly.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const startBtn = document.getElementById('startBtn');
+        const registrationForm = document.getElementById('registrationForm');
+        const scannerSection = document.getElementById('scannerSection');
+        
+        const camera = new SecureCamera('videoElement', 'canvasElement');
+        let capturedImages = [];
+        const requiredImages = 10;
+        let captureInterval = null;
+
+        startBtn.addEventListener('click', async () => {
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            
+            if (!name || !email) {
+                alert("Please provide both name and email.");
+                return;
+            }
+
+            scannerSection.style.display = 'block';
+            startBtn.style.display = 'none';
+            document.getElementById('userName').disabled = true;
+            document.getElementById('userEmail').disabled = true;
+            
+            const started = await camera.start();
+            if (started) {
+                updateStatus('statusText', 'Scanner online. Ready for capture.', 'detecting');
+                // Wait 2 seconds before starting capture
+                setTimeout(startCaptureProcess, 2000);
+            } else {
+                updateStatus('statusText', 'Failed to access camera hardware.', 'error');
+            }
+        });
+
+        function startCaptureProcess() {
+            document.getElementById('progressContainer').style.display = 'block';
+            updateStatus('statusText', 'Scanning facial topography...', 'detecting');
+            
+            captureInterval = setInterval(() => {
+                const imgData = camera.captureFrame();
+                if (imgData) {
+                    capturedImages.push(imgData);
+                    
+                    // Update progress
+                    const progress = (capturedImages.length / requiredImages) * 100;
+                    document.getElementById('progressBar').style.width = progress + '%';
+                    
+                    // Provide some visual feedback (flash)
+                    document.getElementById('canvasElement').style.background = 'rgba(0, 243, 255, 0.3)';
+                    setTimeout(() => {
+                        document.getElementById('canvasElement').style.background = 'transparent';
+                    }, 50);
+
+                    if (capturedImages.length >= requiredImages) {
+                        clearInterval(captureInterval);
+                        finalizeRegistration();
+                    }
+                }
+            }, 600); // capture every 600ms
+        }
+
+        async function finalizeRegistration() {
+            camera.stop();
+            updateStatus('statusText', 'Encrypting biometric data...', 'detecting');
+            document.getElementById('captureInstructions').innerText = 'Transmitting securely to server...';
+            
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        images: capturedImages
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    updateStatus('statusText', 'Signature stored successfully.', 'success');
+                    document.getElementById('captureInstructions').innerHTML = `<a href="/login" style="color: var(--neon-green)">Proceed to Login</a>`;
+                } else {
+                    updateStatus('statusText', `Registration failed: ${data.message}`, 'error');
+                    startBtn.style.display = 'block';
+                    startBtn.innerText = 'Retry Initialization';
+                }
+            } catch (err) {
+                updateStatus('statusText', 'Network connection error.', 'error');
+            }
+        }
+    });
+</script>
+{% endblock %}

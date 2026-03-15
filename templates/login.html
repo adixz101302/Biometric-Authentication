@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="cyber-card" style="width: 100%; max-width: 600px;">
+    <h2 class="card-title">Biometric Authentication</h2>
+    
+    <div id="loginForm" style="margin-bottom: 20px;">
+        <div class="form-group">
+            <input type="email" id="userEmail" class="cyber-input" placeholder="Enter Registration Email" required>
+        </div>
+        <button id="startAuthBtn" class="cyber-button">Authenticate</button>
+    </div>
+
+    <div id="scannerSection" style="display: none;">
+        <div class="webcam-container">
+            <video id="videoElement" autoplay playsinline></video>
+            <canvas id="canvasElement" class="overlay"></canvas>
+        </div>
+        
+        <div id="statusText" class="status-indicator status-detecting">Waiting for face detection...</div>
+        
+        <p style="text-align: center; color: var(--text-secondary); margin-top: 15px; font-size: 0.9rem;">
+            Please position your face clearly in front of the camera.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const startAuthBtn = document.getElementById('startAuthBtn');
+        const loginForm = document.getElementById('loginForm');
+        const scannerSection = document.getElementById('scannerSection');
+        
+        const camera = new SecureCamera('videoElement', 'canvasElement');
+        let authAttempts = 0;
+        const maxAttempts = 5;
+
+        startAuthBtn.addEventListener('click', async () => {
+            const email = document.getElementById('userEmail').value;
+            if (!email) {
+                alert("Please enter your email to load your biometric profile.");
+                return;
+            }
+
+            scannerSection.style.display = 'block';
+            startAuthBtn.style.display = 'none';
+            document.getElementById('userEmail').disabled = true;
+            
+            const started = await camera.start();
+            if (started) {
+                updateStatus('statusText', 'Scanning...', 'detecting');
+                // Wait briefly for camera to adjust exposure
+                setTimeout(() => attemptAuth(email), 1500);
+            } else {
+                updateStatus('statusText', 'Failed to access scanner hardware.', 'error');
+            }
+        });
+
+        async function attemptAuth(email) {
+            if (authAttempts >= maxAttempts) {
+                camera.stop();
+                updateStatus('statusText', 'AUTHENTICATION LOCKOUT. TOO MANY FAILED SCANS.', 'error');
+                return;
+            }
+            
+            authAttempts++;
+            updateStatus('statusText', `Analyzing biometrics... (Attempt ${authAttempts}/${maxAttempts})`, 'detecting');
+            
+            // Draw a quick bounding box effect in center of canvas
+            const cw = camera.canvas.width;
+            const ch = camera.canvas.height;
+            camera.drawBoundingBox(cw/2 - 100, ch/2 - 120, 200, 240, '#ff00ea');
+
+            const imgData = camera.captureFrame();
+            if (imgData) {
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: email,
+                            image: imgData
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        camera.stop();
+                        updateStatus('statusText', 'ACCESS GRANTED. BIOMETRICS MATCHED.', 'success');
+                        
+                        // Redirect or show secure content
+                        setTimeout(() => {
+                            window.location.href = '/admin'; // Example redirect
+                        }, 2000);
+                    } else {
+                        // Failed to match or other error
+                        updateStatus('statusText', `ACCESS DENIED: ${data.message}`, 'error');
+                        // Retry after a short delay
+                        setTimeout(() => attemptAuth(email), 2000);
+                    }
+                } catch (err) {
+                    updateStatus('statusText', 'Secure connection failed.', 'error');
+                    setTimeout(() => attemptAuth(email), 3000);
+                }
+            } else {
+                setTimeout(() => attemptAuth(email), 1000);
+            }
+        }
+    });
+</script>
+{% endblock %}
