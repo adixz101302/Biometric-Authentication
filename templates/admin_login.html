@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="cyber-card" style="width: 100%; max-width: 400px; margin: 0 auto; text-align: center;">
+    <h2 class="card-title">Admin Access Dashboard</h2>
+
+    <div style="margin-bottom: 20px;">
+        <i class="fa-solid fa-lock" style="font-size: 4rem; color: var(--neon-red); animation: pulse 3s infinite;"></i>
+    </div>
+
+    {% if error %}
+        <div style="color: var(--neon-red); margin-bottom: 15px; text-shadow: 0 0 5px var(--neon-red);">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" id="adminLoginForm">
+        <div class="form-group">
+            <input type="password" name="password" class="cyber-input" placeholder="Enter Secure Password" required>
+        </div>
+        <button type="submit" class="cyber-button" style="border-color: var(--neon-red); color: var(--neon-red);">
+            Grant Access
+        </button>
+    </form>
+</div>
+{% endblock %}

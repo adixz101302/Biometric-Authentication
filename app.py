@@ -3,7 +3,7 @@ import io
 import base64
 import numpy as np
 import cv2
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 
 # Import custom modules
 import database
@@ -12,6 +12,7 @@ import biometrics
 app = Flask(__name__)
 # Configurations
 app.config['SECRET_KEY'] = 'super-secret-key-change-in-production'
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'admin123')
 
 # Initialize DB on startup
 database.init_db()
@@ -30,7 +31,26 @@ def login_page():
 
 @app.route('/admin', methods=['GET'])
 def admin_page():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login_page'))
     return render_template('admin.html')
+
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login_page():
+    error = None
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if password == ADMIN_PASSWORD:
+            session['admin_logged_in'] = True
+            return redirect(url_for('admin_page'))
+        else:
+            error = "Invalid Credentials"
+    return render_template('admin_login.html', error=error)
+
+@app.route('/admin_logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    return redirect(url_for('home'))
 
 def base64_to_cv2(base64_string):
     """Converts a base64 encoded image string to a cv2 image."""
@@ -173,6 +193,9 @@ def api_login():
 
 @app.route('/api/logs', methods=['GET'])
 def get_logs():
+    if not session.get('admin_logged_in'):
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
     conn = database.get_db_connection()
     logs = conn.execute('''
         SELECT users.name, users.email, auth_logs.action, auth_logs.status, auth_logs.timestamp 
@@ -186,6 +209,9 @@ def get_logs():
 
 @app.route('/api/users', methods=['GET'])
 def get_users():
+    if not session.get('admin_logged_in'):
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+        
     conn = database.get_db_connection()
     users = conn.execute('SELECT id, name, email, created_at FROM users').fetchall()
     conn.close()
@@ -193,6 +219,9 @@ def get_users():
 
 @app.route('/api/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
+    if not session.get('admin_logged_in'):
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+        
     conn = database.get_db_connection()
     cursor = conn.cursor()
     cursor.execute('DELETE FROM auth_logs WHERE user_id = ?', (user_id,))

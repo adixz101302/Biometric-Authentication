@@ -4,13 +4,17 @@
 <div style="width: 100%; max-width: 1000px; padding: 20px;">
     <h2 class="card-title" style="text-align: left; border-bottom: 2px solid var(--neon-pink); padding-bottom: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
         <span>System Admin Dashboard</span>
-        <span style="font-size: 1rem; color: var(--text-secondary); text-transform: none;"><i class="fa-solid fa-lock"></i> Secure Level 5</span>
+        <span style="font-size: 1rem; color: var(--text-secondary); text-transform: none;">
+            <i class="fa-solid fa-lock"></i> Secure Level 5
+            <a href="{{ url_for('admin_logout') }}" style="margin-left: 15px; color: var(--neon-red); text-decoration: none;"><i class="fa-solid fa-power-off"></i> Logout</a>
+        </span>
     </h2>
     
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+    <div class="dashboard-grid">
         <!-- Users Table -->
         <div class="cyber-card">
             <h3>Registered Identities</h3>
+            <div class="table-responsive">
             <table class="cyber-table" id="usersTable">
                 <thead>
                     <tr>
@@ -24,11 +28,13 @@
                     <!-- Populated via JS -->
                 </tbody>
             </table>
+            </div>
         </div>
 
         <!-- Logs Table -->
         <div class="cyber-card">
             <h3>Authentication Logs</h3>
+            <div class="table-responsive">
             <table class="cyber-table" id="logsTable">
                 <thead>
                     <tr>
@@ -42,6 +48,7 @@
                     <!-- Populated via JS -->
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>

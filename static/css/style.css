@@ -350,3 +350,42 @@ canvas.overlay {
     color: #fff;
     box-shadow: 0 0 10px var(--neon-red);
 }
+
+/* Dashboard Grid for Admin */
+.dashboard-grid {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 30px;
+}
+
+/* Responsive Table Wrapper */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .cyber-nav {
+        flex-direction: column;
+        gap: 15px;
+        padding: 1rem;
+    }
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.8rem;
+    }
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    .card-title {
+        font-size: 1.2rem;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .cyber-card {
+        padding: 1rem;
+    }
+}
