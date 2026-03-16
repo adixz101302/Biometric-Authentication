@@ -41,6 +41,7 @@
                         <th>Identity</th>
                         <th>Action</th>
                         <th>Status</th>
+                        <th>IP Address</th>
                         <th>Timestamp</th>
                     </tr>
                 </thead>
@@ -102,6 +103,7 @@
                         <td>${identity}</td>
                         <td style="text-transform: uppercase;">${log.action}</td>
                         <td><span class="badge ${statusClass}">${log.status}</span></td>
+                        <td style="font-family: monospace; font-size: 0.85rem; color: var(--neon-blue);">${log.ip_address || 'Unknown'}</td>
                         <td style="font-size: 0.8rem; color: var(--text-secondary);">${date.toLocaleString()}</td>
                     `;
                     tbody.appendChild(row);

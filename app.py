@@ -109,9 +109,12 @@ def api_register():
                   (name, email, encrypted_encoding))
     new_user_id = cursor.lastrowid
     
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    client_ip = client_ip.split(',')[0].strip() if client_ip else 'Unknown'
+    
     # Log registration
-    cursor.execute('INSERT INTO auth_logs (user_id, action, status) VALUES (?, ?, ?)',
-                  (new_user_id, 'register', 'success'))
+    cursor.execute('INSERT INTO auth_logs (user_id, action, status, ip_address) VALUES (?, ?, ?, ?)',
+                  (new_user_id, 'register', 'success', client_ip))
     
     conn.commit()
     conn.close()
@@ -123,6 +126,9 @@ def api_login():
     data = request.json
     email = data.get('email')
     image_base64 = data.get('image')
+
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    client_ip = client_ip.split(',')[0].strip() if client_ip else 'Unknown'
 
     if not email or not image_base64:
         return jsonify({"success": False, "message": "Missing email or image"}), 400
@@ -163,8 +169,8 @@ def api_login():
     encoding_to_check, error = biometrics.encode_face(img)
     
     if error:
-        cursor.execute('INSERT INTO auth_logs (user_id, action, status) VALUES (?, ?, ?)',
-                      (user_id, 'login', 'denied'))
+        cursor.execute('INSERT INTO auth_logs (user_id, action, status, ip_address) VALUES (?, ?, ?, ?)',
+                      (user_id, 'login', 'denied', client_ip))
         conn.commit()
         return jsonify({"success": False, "message": f"Access Denied: {error}"}), 401
 
@@ -180,14 +186,14 @@ def api_login():
     is_match, distance = biometrics.match_face(stored_encoding, encoding_to_check)
 
     if is_match:
-        cursor.execute('INSERT INTO auth_logs (user_id, action, status) VALUES (?, ?, ?)',
-                      (user_id, 'login', 'success'))
+        cursor.execute('INSERT INTO auth_logs (user_id, action, status, ip_address) VALUES (?, ?, ?, ?)',
+                      (user_id, 'login', 'success', client_ip))
         conn.commit()
         # In a real app, generate JWT or session here
         return jsonify({"success": True, "message": "Access Granted"})
     else:
-        cursor.execute('INSERT INTO auth_logs (user_id, action, status) VALUES (?, ?, ?)',
-                      (user_id, 'login', 'denied'))
+        cursor.execute('INSERT INTO auth_logs (user_id, action, status, ip_address) VALUES (?, ?, ?, ?)',
+                      (user_id, 'login', 'denied', client_ip))
         conn.commit()
         return jsonify({"success": False, "message": "Access Denied: Biometric data does not match"}), 401
 
@@ -198,7 +204,7 @@ def get_logs():
     
     conn = database.get_db_connection()
     logs = conn.execute('''
-        SELECT users.name, users.email, auth_logs.action, auth_logs.status, auth_logs.timestamp 
+        SELECT users.name, users.email, auth_logs.action, auth_logs.status, auth_logs.ip_address, auth_logs.timestamp 
         FROM auth_logs 
         LEFT JOIN users ON auth_logs.user_id = users.id 
         ORDER BY auth_logs.timestamp DESC LIMIT 100

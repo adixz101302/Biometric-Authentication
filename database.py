@@ -1,7 +1,9 @@
 import sqlite3
 import os
 
-DB_NAME = "biometric.db"
+DB_DIR = os.getenv("DB_DIR", ".")
+os.makedirs(DB_DIR, exist_ok=True)
+DB_NAME = os.path.join(DB_DIR, "biometric.db")
 
 def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
@@ -32,10 +34,17 @@ def init_db():
             user_id INTEGER,
             action TEXT NOT NULL,
             status TEXT NOT NULL,
+            ip_address TEXT,
             timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
     ''')
+
+    # Try to add the column if the DB already existed before this update
+    try:
+        cursor.execute('ALTER TABLE auth_logs ADD COLUMN ip_address TEXT')
+    except sqlite3.OperationalError:
+        pass # Column already exists
 
     conn.commit()
     conn.close()
