@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Biometric Auth - Option 2 API</title>
+    <!-- Google Fonts for Modern Cyber Theme -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        
+        // TODO: USER NEEDS TO ADD THEIR FIREBASE CONFIG HERE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_DOMAIN.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_BUCKET.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "YOUR_APP_ID"
+        };
+        
+        // Initialize Firebase
+        // const app = initializeApp(firebaseConfig);
+        // const db = getFirestore(app);
+        // window.db = db;
+    </script>
+</head>
+<body>
+    <div class="background-grid"></div>
+    <div class="scanline"></div>
+
+    <div class="cyber-container">
+        <nav class="cyber-nav">
+            <div class="logo">
+                <i class="fa-solid fa-expand scanner-icon"></i>
+                <div>
+                    <div class="neon-text">SYS.AUTH</div>
+                    <div class="version">JS.VERSION.2.0</div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-btn"><i class="fa-solid fa-house-chimney"></i> Main</a></li>
+                <li><a href="register.html" class="nav-btn"><i class="fa-solid fa-user-plus"></i> Enroll Identity</a></li>
+                <li><a href="login.html" class="nav-btn"><i class="fa-solid fa-face-viewfinder"></i> Biometric Login</a></li>
+            </ul>
+        </nav>
+
+        <main class="content-wrapper">
+            <div class="cyber-card" style="max-width: 600px; text-align: center;">
+                <h2 class="card-title">Access Terminal (Serverless Edition)</h2>
+                
+                <div style="margin: 30px 0;">
+                    <i class="fa-solid fa-fingerprint" style="font-size: 5rem; color: var(--neon-blue); text-shadow: 0 0 20px rgba(0,243,255,0.5); animation: pulse 2s infinite;"></i>
+                </div>
+                
+                <p style="margin-bottom: 20px; line-height: 1.6;">
+                    The system has been reconfigured to operate in a pure 100% serverless environment without Python. All facial computations are processed directly on your device utilizing <span style="color:var(--neon-green)">TensorFlow.js</span>, and biometric tokens are stored in the <span style="color:var(--neon-pink)">Firebase Cloud</span>.
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                    <a href="register.html" class="cyber-button" style="text-decoration: none;">New Identity</a>
+                    <a href="login.html" class="cyber-button" style="text-decoration: none; border-color: var(--neon-green); color: var(--neon-green);">System Login</a>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

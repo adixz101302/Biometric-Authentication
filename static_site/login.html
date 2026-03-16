@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biometric Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Load Firebase and AI Logic -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script type="module" src="js/face-auth-login.js"></script>
+</head>
+<body>
+    <div class="background-grid"></div>
+    <div class="scanline"></div>
+
+    <div class="cyber-container">
+        <nav class="cyber-nav">
+            <div class="logo">
+                <i class="fa-solid fa-expand scanner-icon"></i>
+                <div class="neon-text">SYS.AUTH</div>
+            </div>
+            <a href="index.html" class="nav-btn"><i class="fa-solid fa-arrow-left"></i> Abort</a>
+        </nav>
+
+        <main class="content-wrapper">
+            <div class="cyber-card" style="width: 100%; max-width: 600px;">
+                <h2 class="card-title">Initiate Sub-routine: Identity Verification</h2>
+                
+                <div class="webcam-container">
+                    <video id="video" width="480" height="360" autoplay muted></video>
+                    <canvas id="overlay" class="overlay"></canvas>
+                </div>
+                
+                <div class="status-indicator" id="statusMessage" style="font-size: 1.5rem; text-transform: uppercase;">
+                    Initializing Optical Sensors...
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="index.html" class="cyber-button" style="display:inline-block; max-width: 200px;">Return to Main</a>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
