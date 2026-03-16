@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Firebase wrapper module -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/admin.js"></script>
+
+    <script>
+        // Cheap Client Guard. Production should use Security Rules.
+        if (localStorage.getItem('adminAuth') !== 'true') {
+            window.location.href = 'admin_login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="background-grid"></div>
+    <div class="scanline"></div>
+
+    <div class="cyber-container">
+        <div style="width: 100%; max-width: 1000px; padding: 20px;">
+            <h2 class="card-title" style="text-align: left; border-bottom: 2px solid var(--neon-pink); padding-bottom: 15px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+                <span>System Admin Dashboard</span>
+                <span style="font-size: 1rem; color: var(--text-secondary); text-transform: none;">
+                    <i class="fa-solid fa-lock"></i> Secure Level 5
+                    <a href="#" id="logoutBtn" style="margin-left: 15px; color: var(--neon-red); text-decoration: none;"><i class="fa-solid fa-power-off"></i> Logout</a>
+                </span>
+            </h2>
+            
+            <div class="dashboard-grid">
+                <!-- Users Table -->
+                <div class="cyber-card">
+                    <h3>Registered Identities</h3>
+                    <div class="table-responsive">
+                    <table class="cyber-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table></div>
+                </div>
+
+                <!-- Logs Table -->
+                <div class="cyber-card">
+                    <h3>Authentication Logs</h3>
+                    <div class="table-responsive">
+                    <table class="cyber-table" id="logsTable">
+                        <thead>
+                            <tr>
+                                <th>Identity</th>
+                                <th>Action</th>
+                                <th>Status</th>
+                                <th>IP Address</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

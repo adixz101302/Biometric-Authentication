@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Biometric Auth</title>
+    <!-- Google Fonts for Modern Cyber Theme -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="background-grid"></div>
+    <div class="scanline"></div>
+
+    <div class="cyber-container">
+        <nav class="cyber-nav">
+            <div class="logo">
+                <i class="fa-solid fa-expand scanner-icon"></i>
+                <div class="neon-text">SYS.AUTH</div>
+            </div>
+            <a href="index.html" class="nav-btn"><i class="fa-solid fa-arrow-left"></i> Main</a>
+        </nav>
+
+        <main class="content-wrapper">
+            <div class="cyber-card" style="width: 100%; max-width: 400px; margin: 0 auto; text-align: center;">
+                <h2 class="card-title">Admin Access Required</h2>
+                
+                <form id="adminForm">
+                    <div class="form-group">
+                        <label>Admin Password</label>
+                        <input type="password" id="adminPassword" class="cyber-input" required>
+                    </div>
+                    <div id="errorMsg" class="status-error" style="display:none; font-size:12px;">Access Denied</div>
+                    <button type="submit" class="cyber-button" style="width: 100%; margin-top: 20px;">Authorize</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('adminForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const pw = document.getElementById('adminPassword').value;
+            // Basic frontend check. Real apps should validate via backend/firestore rules.
+            if(pw === 'admin123') {
+                localStorage.setItem('adminAuth', 'true');
+                window.location.href = 'admin.html';
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
